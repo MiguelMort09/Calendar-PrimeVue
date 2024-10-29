@@ -11,7 +11,7 @@
     "devDependencies": {
         "@nuxt/devtools": "latest",
         "@primevue/nuxt-module": "^4.0.0-rc.3",
-        "nuxt": "^3.12.1"
+        "nuxt": "^3.13.2"
     },
     "dependencies": {
         "@primevue/themes": "^4.0.0-rc.3",

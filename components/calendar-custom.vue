@@ -2,6 +2,24 @@
 import { ref, computed } from 'vue';
 import DatePicker from "primevue/datepicker";
 
+/**
+ * Reactive Variables
+ *
+ * @const mode {Ref<'single' | 'range'>} - Defines the date selection mode:
+ *    - 'single': Allows the user to select a single date.
+ *    - 'range': Allows the user to select a range of dates.
+ *    Using `mode` provides a more intuitive interface for the user, as the calendar dynamically adapts based on the selection mode.
+ *
+ * @const dates {Ref<Date | [Date | null, Date | null] | null>} - Holds the selected date(s):
+ *    - `Date`: Used when `mode` is set to 'single' for single-date selection.
+ *    - `[Date | null, Date | null]`: Array for range selection, where:
+ *        - dates[0] represents the start date
+ *        - dates[1] represents the end date.
+ *    - `null`: Initialized as null to represent no selection by default.
+ *
+ * @const minDate {Ref<Date>} - Sets the minimum selectable date, initialized to the current date.
+ *    Though not a strict requirement, this can be useful for restricting date selection to future dates in specific use cases.
+ */
 const mode = ref<'single' | 'range'>('single');
 const dates = ref<Date | [Date | null, Date | null] | null>(null);
 const minDate = ref(new Date());
@@ -15,6 +33,10 @@ const daysBetween = computed(() => {
     return 1;
 });
 
+/**
+ * @function incrementEndDate
+ * Increments the end date in mode range dates.
+ */
 function incrementEndDate() {
     if (Array.isArray(dates.value) && dates.value[0] && dates.value[1]) {
         const newEnd = new Date(dates.value[1] || dates.value[0]);
@@ -23,6 +45,10 @@ function incrementEndDate() {
     }
 }
 
+/**
+ * @function decrementEndDate
+ * Decrement the end date in mode range dates.
+ */
 function decrementEndDate() {
     if (Array.isArray(dates.value) && dates.value[1] && daysBetween.value > 1) {
         const newEnd = new Date(dates.value[1]);
@@ -31,6 +57,12 @@ function decrementEndDate() {
     }
 }
 
+/**
+ * @function changeMode
+ * Changes the selection mode between 'single' and 'range'.
+ * - Resets `dates` to `null` in 'single' mode to remove any range selection.
+ * @param {string} newMode - The new selection mode ('single' or 'range').
+ */
 function changeMode(newMode) {
     mode.value = newMode;
     if(newMode === 'single') {
@@ -40,10 +72,20 @@ function changeMode(newMode) {
     }
 }
 
+/**
+ * @function clearDates
+ * Clears the selected dates, resetting `dates` to `null`.
+ */
 function clearDates() {
     dates.value = null;
 }
 
+/**
+ * @function formatDate
+ * Formats a given Date object to the format 'dd/mm/yyyy'.
+ * @param {Date | null} date - The date to format. Returns an empty string if `date` is null.
+ * @returns {string} - The formatted date string.
+ */
 function formatDate(date: Date | null): string {
     if (!date) return '';
     const day = String(date.getDate()).padStart(2, '0');
@@ -52,6 +94,13 @@ function formatDate(date: Date | null): string {
     return `${day}/${month}/${year}`;
 }
 
+/**
+ * @computed formattedDates
+ * Computes the display format of the selected dates.
+ * - For 'single' mode: Returns the single selected date twice (start and end are the same).
+ * - For 'range' mode: Returns a formatted range (start and end date).
+ * - Returns an empty string if there are no valid dates.
+ */
 const formattedDates = computed(() => {
     if (mode.value === 'single' && dates.value) {
         return `${formatDate(dates.value)}-${formatDate(dates.value)}`;
